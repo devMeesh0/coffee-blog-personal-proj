@@ -1,0 +1,717 @@
+<!--
+Sip and Read with Jackie and Ameesh — Front Page (Single-file demo)
+Style direction: Squarespace “Reseda” template (airy whitespace, bold type, image-forward, minimal chrome).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sip and Read with Jackie and Ameesh</title>
+  <meta name="description" content="Coffee reviews, book reviews, and everything in between — by Jackie and Ameesh." />
+
+  <!-- Blocky, chic display font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      /* Warm + colorful but calm */
+      --bg: #fbf7f2;          /* warm paper */
+      --panel: #ffffff;
+      --ink: #171311;         /* espresso ink */
+      --muted: rgba(23,19,17,.68);
+      --rule: rgba(23,19,17,.12);
+
+      --accent: #c85a3f;      /* terracotta */
+      --accent2: #3a7f73;     /* sage-teal */
+      --accent3: #f2c84b;     /* soft crema */
+
+      --max: 1120px;
+      --pad: 24px;
+      --r-lg: 28px;
+      --r-md: 18px;
+
+      --sans: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --serif: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+      --shadow: 0 14px 45px rgba(23,19,17,.10);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 520px at 15% 10%, rgba(200,90,63,.18), transparent 60%),
+        radial-gradient(820px 520px at 85% 20%, rgba(58,127,115,.16), transparent 60%),
+        radial-gradient(760px 520px at 70% 92%, rgba(242,200,75,.16), transparent 55%),
+        var(--bg);
+      font-family: var(--sans);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ color: var(--accent); }
+
+    .container{ max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
+
+    /* --- Header (minimal, not cluttered) --- */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(251,247,242,.78);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding: 18px 0;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 260px;
+    }
+
+    .brandMark{
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: conic-gradient(from 180deg, var(--accent), var(--accent3), var(--accent2), var(--accent));
+      box-shadow: 0 0 0 6px rgba(23,19,17,.04);
+    }
+
+    .brandText{
+      display:flex;
+      flex-direction:column;
+      line-height:1.05;
+    }
+
+    .brandText strong{
+      font-family: var(--sans);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: 14px;
+    }
+
+    .brandText span{
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .navLinks{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .navLinks a{
+      position: relative;
+      padding: 10px 2px;
+      color: rgba(23,19,17,.82);
+    }
+
+    .navLinks a::after{
+      content:"";
+      position:absolute;
+      left:0;
+      right:0;
+      bottom: 6px;
+      height: 2px;
+      background: transparent;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    .navLinks a:hover{ color: var(--ink); }
+    .navLinks a:hover::after{ background: var(--accent); transform: scaleX(1); }
+
+    .menuBtn{
+      display:none;
+      border: 1px solid var(--rule);
+      background: var(--panel);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    /* --- Mobile menu overlay --- */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(23,19,17,.50);
+      display:none;
+      z-index: 60;
+    }
+    .overlay.open{ display:block; }
+
+    .drawer{
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100%;
+      width: min(360px, 92vw);
+      background: var(--panel);
+      border-left: 1px solid var(--rule);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      transform: translateX(110%);
+      transition: transform 220ms ease;
+      z-index: 70;
+    }
+    .drawer.open{ transform: translateX(0); }
+
+    .drawerTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 14px;
+      font-family: var(--sans);
+    }
+
+    .closeBtn{
+      border: 1px solid var(--rule);
+      background: var(--bg);
+      border-radius: 999px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .drawerLinks{
+      display:grid;
+      gap:10px;
+      font-family: var(--sans);
+    }
+
+    .drawerLinks a{
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--rule);
+      background: #fff;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .drawerLinks a:hover{ border-color: rgba(23,19,17,.22); }
+
+    /* --- Main --- */
+    main{ padding: 40px 0 80px; }
+
+    .hero{
+      padding: 64px 0 32px;
+      text-align: center;
+    }
+
+    .heroCopy{
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .eyebrow{
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(23,19,17,.58);
+      margin-bottom: 14px;
+    }
+
+    h1{
+      font-family: var(--sans);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 0.85;
+      font-size: clamp(48px, 7vw, 110px);
+      margin: 0 0 18px;
+    }
+
+    .lede{
+      margin: 0;
+      font-size: 17px;
+      color: rgba(23,19,17,.74);
+      max-width: 62ch;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+      font-family: var(--sans);
+    }
+
+    .btn{
+      border: 1px solid var(--rule);
+      background: var(--panel);
+      padding: 12px 14px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(23,19,17,.22); }
+
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(200,90,63,.14), rgba(242,200,75,.18));
+      border-color: rgba(200,90,63,.28);
+    }
+
+    .btn .dot{
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent2);
+    }
+
+    /* Image-forward hero card (Reseda-ish) */
+    .heroMedia{
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--rule);
+      box-shadow: var(--shadow);
+      position: relative;
+      min-height: 420px;
+    }
+
+    .heroMedia::before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background:
+        radial-gradient(420px 280px at 25% 25%, rgba(200,90,63,.30), transparent 55%),
+        radial-gradient(420px 280px at 80% 35%, rgba(58,127,115,.26), transparent 60%),
+        radial-gradient(380px 260px at 55% 80%, rgba(242,200,75,.28), transparent 60%);
+    }
+
+    .heroMedia::after{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.00) 0%, rgba(255,255,255,.00) 55%, rgba(255,255,255,.96) 100%);
+    }
+
+    .mediaLabel{
+      position:absolute;
+      left: 18px;
+      bottom: 16px;
+      right: 18px;
+      z-index: 2;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      font-family: var(--sans);
+    }
+
+    .mediaLabel .title{
+      font-weight: 850;
+      letter-spacing: -0.02em;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .mediaLabel .sub{
+      font-size: 12px;
+      color: rgba(23,19,17,.62);
+      margin: 4px 0 0;
+    }
+
+    .mediaPill{
+      background: rgba(255,255,255,.90);
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* --- Minimal feed (not cluttered) --- */
+    .section{
+      margin-top: 52px;
+      padding-top: 30px;
+      border-top: 1px solid var(--rule);
+    }
+
+    .sectionHead{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .sectionHead h2{
+      font-family: var(--sans);
+      font-weight: 850;
+      letter-spacing: -0.02em;
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .filters{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-family: var(--sans);
+    }
+
+    .filterBtn{
+      border: 1px solid var(--rule);
+      background: rgba(255,255,255,.70);
+      border-radius: 999px;
+      padding: 10px 12px;
+      cursor:pointer;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(23,19,17,.74);
+      transition: border-color 160ms ease, transform 160ms ease;
+    }
+
+    .filterBtn:hover{ transform: translateY(-1px); border-color: rgba(23,19,17,.22); }
+    .filterBtn.active{ border-color: rgba(200,90,63,.50); color: var(--ink); background: rgba(200,90,63,.10); }
+
+    .feed{
+      border: 1px solid var(--rule);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .post{
+      display:grid;
+      grid-template-columns: 140px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 18px 18px;
+      border-bottom: 1px solid var(--rule);
+      font-family: var(--sans);
+    }
+    .post:last-child{ border-bottom:none; }
+
+    .postMeta{
+      font-size: 12px;
+      color: rgba(23,19,17,.62);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .postTitle{
+      margin: 0;
+      font-size: 16px;
+      font-weight: 850;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+    }
+
+    .postExcerpt{
+      margin: 6px 0 0;
+      font-family: var(--serif);
+      color: rgba(23,19,17,.70);
+      font-size: 15px;
+    }
+
+    .postArrow{
+      color: rgba(23,19,17,.50);
+      font-weight: 900;
+      font-size: 18px;
+      padding-left: 10px;
+    }
+
+    .post:hover{ background: rgba(200,90,63,.06); }
+    .post:hover .postArrow{ color: var(--accent); }
+
+    /* --- Footer --- */
+    footer{
+      margin-top: 66px;
+      padding-top: 22px;
+      border-top: 1px solid var(--rule);
+      color: rgba(23,19,17,.62);
+      font-family: var(--sans);
+      font-size: 13px;
+      display:flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero{ grid-template-columns: 1fr; }
+      .heroMedia{ min-height: 360px; }
+      .post{ grid-template-columns: 120px 1fr auto; }
+    }
+
+    @media (max-width: 720px){
+      .navLinks{ display:none; }
+      .menuBtn{ display:inline-flex; }
+      .brand{ min-width: auto; }
+      .post{ grid-template-columns: 1fr auto; gap: 10px; }
+      .postMeta{ grid-column: 1 / -1; }
+      .postExcerpt{ display:none; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior:auto!important; transition:none!important; animation:none!important; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <div class="nav" aria-label="Primary navigation">
+        <a class="brand" href="#" aria-label="Home">
+          <span class="brandMark" aria-hidden="true"></span>
+          <span class="brandText">
+            <strong>Sip and Read</strong>
+            <span>with Jackie and Ameesh</span>
+          </span>
+        </a>
+
+        <nav class="navLinks" aria-label="Pages">
+          <a href="#">Home</a>
+          <a href="#coffee">Coffee</a>
+          <a href="#books">Books</a>
+          <a href="#misc">Misc</a>
+          <a href="#about">About</a>
+        </nav>
+
+        <button class="menuBtn" id="menuBtn" aria-expanded="false" aria-controls="drawer">Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile drawer -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+  <aside class="drawer" id="drawer" aria-label="Mobile menu">
+    <div class="drawerTop">
+      <div style="font-weight:900; letter-spacing:-0.02em">Sip and Read</div>
+      <button class="closeBtn" id="closeBtn" aria-label="Close menu">Close</button>
+    </div>
+    <nav class="drawerLinks" aria-label="Mobile pages">
+      <a href="#">Home</a>
+      <a href="#coffee">Coffee</a>
+      <a href="#books">Books</a>
+      <a href="#misc">Misc</a>
+      <a href="#about">About</a>
+    </nav>
+    <div style="margin-top:16px; font-family:var(--serif); color:rgba(23,19,17,.68)">
+      Clean reviews. No filler. A little chaos, responsibly.
+    </div>
+  </aside>
+
+  <main class="container">
+    <section class="hero" aria-label="Hero">
+      <div class="heroCopy">
+        <div class="eyebrow">Coffee • Books • Misc</div>
+        <h1>Sip and Read with Jackie and Ameesh</h1>
+        <p class="lede">
+          Placeholder intro sentence for the blog.
+          Another short placeholder sentence describing what readers will find.
+        </p>
+
+        <div class="cta">
+          <a class="btn primary" href="#latest"><span class="dot" aria-hidden="true"></span>Latest posts</a>
+          <a class="btn" href="#coffee">Coffee reviews</a>
+          <a class="btn" href="#books">Book reviews</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="latest" aria-label="Latest posts">
+      <div class="sectionHead">
+        <h2>Latest posts</h2>
+        <div class="filters" aria-label="Filters">
+          <button class="filterBtn active" data-filter="all">All</button>
+          <button class="filterBtn" data-filter="coffee">Coffee</button>
+          <button class="filterBtn" data-filter="book">Books</button>
+          <button class="filterBtn" data-filter="misc">Misc</button>
+        </div>
+      </div>
+
+      <div class="feed" id="feed"></div>
+    </section>
+
+    <!-- Placeholder anchors for future pages/routes -->
+    <section class="section" id="coffee" aria-label="Coffee placeholder">
+      <div class="sectionHead">
+        <h2>Coffee</h2>
+        <div class="filters"><span style="font-family:var(--sans); color:var(--muted)">Hub page coming next →</span></div>
+      </div>
+      <div class="feed" style="padding:18px; font-family:var(--serif); color:rgba(23,19,17,.70)">
+        This will become your coffee hub: summary + filters (origin, method, roast) + deep dives.
+      </div>
+    </section>
+
+    <section class="section" id="books" aria-label="Books placeholder">
+      <div class="sectionHead">
+        <h2>Books</h2>
+        <div class="filters"><span style="font-family:var(--sans); color:var(--muted)">Hub page coming next →</span></div>
+      </div>
+      <div class="feed" style="padding:18px; font-family:var(--serif); color:rgba(23,19,17,.70)">
+        This will become your book hub: summary + filters (genre, length, spoiler-free) + deep dives.
+      </div>
+    </section>
+
+    <section class="section" id="misc" aria-label="Misc placeholder">
+      <div class="sectionHead">
+        <h2>Misc</h2>
+        <div class="filters"><span style="font-family:var(--sans); color:var(--muted)">Hub page coming next →</span></div>
+      </div>
+      <div class="feed" style="padding:18px; font-family:var(--serif); color:rgba(23,19,17,.70)">
+        Catch-all reviews: cafés, gear, snacks, reading spots, whatever deserves a rating.
+      </div>
+    </section>
+
+    <section class="section" id="about" aria-label="About placeholder">
+      <div class="sectionHead">
+        <h2>About</h2>
+        <div class="filters"><span style="font-family:var(--sans); color:var(--muted)">Page coming next →</span></div>
+      </div>
+      <div class="feed" style="padding:18px; font-family:var(--serif); color:rgba(23,19,17,.70)">
+        Bios, the “solo vs together” concept, and how to reach you.
+      </div>
+    </section>
+
+    <footer>
+      <div>© <span id="year"></span> Sip and Read with Jackie and Ameesh</div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap">
+        <a href="#latest">Latest</a>
+        <a href="#coffee">Coffee</a>
+        <a href="#books">Books</a>
+        <a href="#misc">Misc</a>
+        <a href="#about">About</a>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Minimal demo data for the feed
+    const posts = [
+      // Reverse-chronological placeholders (prototype)
+      { type: 'coffee', date: '1/3/2026', title: 'LEAPS Coffee - Black Coffee - Ameesh - 1/3/2026', excerpt: 'Placeholder summary sentence for this review.' },
+      { type: 'coffee', date: '12/28/2025', title: 'Ghost Coffee Roaster - Cold Brew - Jackie - 12/28/2025', excerpt: 'Placeholder summary sentence for this review.' },
+      { type: 'book', date: '12/10/2025', title: 'Book Review Placeholder - Jackie - 12/10/2025', excerpt: 'Placeholder summary sentence for this review.' },
+      { type: 'misc', date: '11/22/2025', title: 'Misc Review Placeholder - Ameesh - 11/22/2025', excerpt: 'Placeholder summary sentence for this review.' },
+      { type: 'coffee', date: '2/1/2023', title: 'Ghost Coffee Roaster - Cold Brew - Jackie - 2/1/2023', excerpt: 'Placeholder summary sentence for this review.' }
+    ];
+
+    const feed = document.getElementById('feed');
+    const buttons = Array.from(document.querySelectorAll('.filterBtn'));
+
+    const typeLabel = (t) => {
+      if (t === 'coffee') return 'Coffee';
+      if (t === 'book') return 'Books';
+      return 'Misc';
+    };
+
+    const render = (filter = 'all') => {
+      const list = posts.filter(p => filter === 'all' ? true : p.type === filter);
+      feed.innerHTML = list.map(p => `
+        <a class="post" href="#" data-type="${p.type}">
+          <div class="postMeta">${typeLabel(p.type)} • ${p.date}</div>
+          <div>
+            <p class="postTitle">${p.title}</p>
+            <p class="postExcerpt">${p.excerpt}</p>
+          </div>
+          <div class="postArrow" aria-hidden="true">→</div>
+        </a>
+      `).join('');
+
+      if (!list.length) {
+        feed.innerHTML = `
+          <div class="post" style="grid-template-columns: 1fr;">
+            <div>
+              <p class="postTitle">No posts yet for that filter.</p>
+              <p class="postExcerpt">Add content and this list will fill in automatically.</p>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    buttons.forEach(b => {
+      b.addEventListener('click', () => {
+        buttons.forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        render(b.dataset.filter);
+      });
+    });
+
+    // Mobile drawer
+    const menuBtn = document.getElementById('menuBtn');
+    const overlay = document.getElementById('overlay');
+    const drawer = document.getElementById('drawer');
+    const closeBtn = document.getElementById('closeBtn');
+
+    const openMenu = () => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      menuBtn.setAttribute('aria-expanded', 'true');
+      overlay.setAttribute('aria-hidden', 'false');
+    };
+
+    const closeMenu = () => {
+      overlay.classList.remove('open');
+      drawer.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      overlay.setAttribute('aria-hidden', 'true');
+    };
+
+    menuBtn.addEventListener('click', () => {
+      const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
+      expanded ? closeMenu() : openMenu();
+    });
+    overlay.addEventListener('click', closeMenu);
+    closeBtn.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Initial
+    render('all');
+  </script>
+</body>
+</html>
